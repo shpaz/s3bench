@@ -157,6 +157,7 @@ if __name__ == '__main__':
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
                                                size=object_analyzer.object_size,
+                                               size_in_bytes=humanfriendly.parse_size(object_analyzer.object_size),
                                                object_name=object_name,
                                                source=socket.gethostname())
 
@@ -177,6 +178,7 @@ if __name__ == '__main__':
             object_analyzer.write_elastic_data(latency=latency,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
-                                               size=obj['Size'],
+                                               size_in_bytes=obj['Size'],
+                                               size=humanfriendly.format_size(obj['Size']),
                                                object_name=object_name,
                                                source=socket.gethostname())
