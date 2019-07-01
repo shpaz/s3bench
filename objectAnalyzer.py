@@ -61,6 +61,11 @@ class ObjectAnalyzer:
     def create_bucket(self):
         self.s3.create_bucket(Bucket=self.bucket_name)
 
+    '''This method calculates each request's throughput'''
+    def calcuate_throughput(self, latency, req_size_in_bytes):
+        # IOPS * BS / TO_MB
+        return (1000 / latency) * req_size_in_bytes / 1000 ** 2
+
     ''' This function writes an object to object storage using in-memory generated binary data'''
     def put_object(self, object_name, bin_data):
         self.s3.put_object(Key=object_name, Bucket=self.bucket_name, Body=bin_data)
@@ -86,11 +91,21 @@ class ObjectAnalyzer:
     def get_workload(self):
         return self.workload
 
-    def time_operation(self, func):
-        start = datetime.datetime.now()
-        func
-        end = datetime.datetime.now()
-        return (end - start).total_seconds() * 1000
+    def time_operation(self, method, object_name, bin_data):
+
+        if method == 'GET':
+            start = datetime.datetime.now()
+            self.get_object(object_name)
+            end = datetime.datetime.now()
+            diff = (end - start).total_seconds() * 1000
+
+        elif method == 'PUT':
+            start = datetime.datetime.now()
+            self.put_object(object_name, bin_data)
+            end = datetime.datetime.now()
+            diff = (end - start).total_seconds() * 1000
+
+        return diff
 
     '''This method parses time into kibana timestamp'''
     def create_timestamp(self):
@@ -150,19 +165,27 @@ if __name__ == '__main__':
             object_name = object_analyzer.generate_object_name()
 
             # time put operation
-            latency = object_analyzer.time_operation(object_analyzer.put_object(object_name=object_name,
-                                                                                bin_data=data))
+            latency = object_analyzer.time_operation('PUT', object_name=object_name, bin_data=data)
+
+            # gets object size in bytes
+            size_in_bytes = humanfriendly.parse_size(object_analyzer.object_size)
+
+            # calculates throughput per request
+            throughput = object_analyzer.calcuate_throughput(latency, size_in_bytes)
+
             # write data to elasticsearch
             object_analyzer.write_elastic_data(latency=latency,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
                                                size=object_analyzer.object_size,
-                                               size_in_bytes=humanfriendly.parse_size(object_analyzer.object_size),
+                                               size_in_bytes=size_in_bytes,
+                                               throughput=object_analyzer.calcuate_throughput(latency, size_in_bytes),
                                                object_name=object_name,
                                                source=socket.gethostname())
-
+    # in case the user chosen read operation
     elif object_analyzer.get_workload() == "read":
 
+        # gathers a list of the wanted objects
         objects = object_analyzer.list_objects(object_analyzer.num_objects)
 
         # reads wanted number of objects to the bucket
@@ -172,13 +195,23 @@ if __name__ == '__main__':
             object_name = obj['Key']
 
             # gathers latency from get operation
-            latency = object_analyzer.time_operation(object_analyzer.get_object(object_name=object_name))
+            latency = object_analyzer.time_operation('GET', object_name, "")
+
+            # get the object size parsed
+            size = humanfriendly.format_size(obj['Size'])
+
+            # gets the size of bytes
+            size_in_bytes = obj['Size']
+
+            # calculates throughput
+            throughput = object_analyzer.calcuate_throughput(latency, size_in_bytes)
 
             # write data to elasticsearch
             object_analyzer.write_elastic_data(latency=latency,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
-                                               size_in_bytes=obj['Size'],
-                                               size=humanfriendly.format_size(obj['Size']),
+                                               size_in_bytes=size_in_bytes,
+                                               size=size,
                                                object_name=object_name,
+                                               throughput=throughput,
                                                source=socket.gethostname())
