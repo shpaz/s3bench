@@ -33,6 +33,7 @@ class ObjectAnalyzer:
         parser.add_argument('-u', '--elastic-url', help='elastic cluster url', required=True)
         parser.add_argument('-n', '--num-objects', help='number of objects to put/get', required=True)
         parser.add_argument('-w', '--workload', help='workload running on s3 - read/write', required=True)
+        parser.add_argument('-c', '--cleanup', help='should we cleanup all the object that were written yes/no', required=False)
 
         # parsing all arguments
         args = parser.parse_args()
@@ -47,9 +48,11 @@ class ObjectAnalyzer:
         self.object_name = ""
         self.num_objects = args.num_objects
         self.workload = args.workload
+        self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, aws_access_key_id=self.access_key,
                                aws_secret_access_key=self.secret_key)
         self.elastic = Elasticsearch(self.elastic_cluster)
+        self.cleanup_list = []
 
     ''' This function checks for bucket existence '''
     def check_bucket_existence(self):
@@ -69,6 +72,7 @@ class ObjectAnalyzer:
     ''' This function writes an object to object storage using in-memory generated binary data'''
     def put_object(self, object_name, bin_data):
         self.s3.put_object(Key=object_name, Bucket=self.bucket_name, Body=bin_data)
+        self.cleanup_list.append(object_name)
 
     ''' This function gets an object from object storage'''
     def get_object(self, object_name):
@@ -91,6 +95,11 @@ class ObjectAnalyzer:
     def get_workload(self):
         return self.workload
 
+    ''' This function returns weather the client needs a cleanup '''
+    def get_cleanup(self):
+        return self.cleanup
+
+    ''' This function is a generic timer for s3 CRUD operations '''
     def time_operation(self, method, object_name, bin_data):
 
         if method == 'GET':
@@ -139,6 +148,11 @@ class ObjectAnalyzer:
         objects = self.s3.list_objects_v2(Bucket=self.bucket_name, MaxKeys=int(max_keys))
         return objects
 
+    ''' This function deletes all objects created within the workload ''' 
+    def objects_cleanup(self):
+        for object_name in self.cleanup_list:
+            self.s3.delete_object(Bucket=self.bucket_name, Key=object_name)
+
 
 if __name__ == '__main__':
 
@@ -182,6 +196,7 @@ if __name__ == '__main__':
                                                throughput=object_analyzer.calcuate_throughput(latency, size_in_bytes),
                                                object_name=object_name,
                                                source=socket.gethostname())
+
     # in case the user chosen read operation
     elif object_analyzer.get_workload() == "read":
 
@@ -215,3 +230,5 @@ if __name__ == '__main__':
                                                object_name=object_name,
                                                throughput=throughput,
                                                source=socket.gethostname())
+    if object_analyzer.get_cleanup() == "yes": 
+            object_analyzer.objects_cleanup()
