@@ -1,4 +1,4 @@
-S3 Performance Analyzer
+## S3 Performance Analyzer
 
 This project contains a container-based tool for benchmarking and visualizing various S3 workloads. This tool can be run on-premise, on the cloud etc (as long as storage backend provides native S3 API).
 
@@ -10,7 +10,7 @@ git clone https://github.com/shonpaz123/s3_bencher.git
 ```
 ### Prerequisites
 
-What things you need to install the software and how to install them
+To use this tool, you should have a running ELK cluster and a S3 based service. 
 
 ```
 Give examples
@@ -60,9 +60,7 @@ Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Docker Cloud](https://cloud.docker.com/) - used for automated build out of web-hooked source code. 
 
 ## Contributing
 
@@ -70,17 +68,15 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+Supported versions for infrastructure components are: 
+- ELK stack < 7.0
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Shon Paz** - *Initial work* - [shonpaz123](https://github.com/shonpaz123)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+## Future Plans 
+- Support for K8S and docker-compose 
 
 ## Acknowledgments
 
