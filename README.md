@@ -69,21 +69,22 @@ optional arguments:
 This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data. The dashboard contains: 
 
 * Latency Histogram: 
+
 <p align="center">
-    <img src="../master/dashboard/Latency.png" alt="Image" width="800" height="600" />
+    <img src="../master/dashboard/Latency.png" alt="Image" width="400" height="300" />
 </p>
 
-->![Latency Histogram](../master/dashboard/Latency.png)<-
+<p align="center">
+    <img src="../master/dashboard/Throughput.png" alt="Image" width="400" height="300" />
+</p>
 
-* Throughput Histogram: 
-->![Throughput Histogram](../master/dashboard/Throughput.png)<-
+<p align="center">
+    <img src="../master/dashboard/Percentiles.png" alt="Image" width="400" height="300" />
+</p>
 
-* Percentile divition: 
-->![Percentiles](../master/dashboard/Percentiles.png)<-
-
-* Max Object Latency: 
-->![Max Object Latency](../master/dashboard/MaxLatencyObject.png)<-
-
+<p align="center">
+    <img src="../master/dashboard/MaxLatencyObject.png" alt="Image" width="400" height="300" />
+</p>
 
 You are more than welcome to add one of your own ... ;)
 To import the dashboard please go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.json file. 
