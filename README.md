@@ -12,10 +12,6 @@ git clone https://github.com/shonpaz123/s3bencher.git
 
 To use this tool, you should have a running ELK cluster and a S3 based service. 
 
-```
-Give examples
-```
-
 ### Installing
 
 To install this tool, you could choose between building the image on your on, or pulling the pre-built docker image. 
@@ -24,7 +20,6 @@ To build the image:
 ```
 git clone https://github.com/shonpaz123/s3bencher.git && cd s3bencher
 docker build -t s3bench .
-
 ```
 
 To pull the existing docker image: 
