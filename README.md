@@ -6,7 +6,7 @@ This project contains a container-based tool for benchmarking and visualizing va
 
 To start using analyzer, please clone this git repostory: 
 ```
-git clone https://github.com/shonpaz123/s3_bencher.git
+git clone https://github.com/shonpaz123/s3bencher.git
 ```
 ### Prerequisites
 
@@ -18,20 +18,20 @@ Give examples
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
+To install this tool, you could choose between building the image on your on, or pulling the pre-built docker image. 
+To build the image:
 
 ```
-until finished
+git clone https://github.com/shonpaz123/s3bencher.git && cd s3bencher
+docker build -t s3bench .
+
 ```
 
+To pull the existing docker image: 
+
+```
+docker pull shonpaz123/s3bench
+```
 End with an example of getting some data out of the system or using it for a little demo
 
 ## Running the tests
