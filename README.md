@@ -18,7 +18,7 @@ To install this tool, you could choose between building the image on your on, or
 To build the image:
 
 ```
-git clone https://github.com/shonpaz123/s3bencher.git && cd s3bencher
+git clone https://github.com/shonpaz123/s3bench.git && cd s3bench
 docker build -t s3bench .
 ```
 
@@ -27,28 +27,43 @@ To pull the existing docker image:
 ```
 docker pull shonpaz123/s3bench
 ```
-End with an example of getting some data out of the system or using it for a little demo
 
-## Running the tests
+## Running tests
 
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+To run this tool, you could run ``` docker run shonpaz123/s3bench ``` command to view which arguments should be passed, for example:
 
 ```
-Give an example
+docker run shonpaz123/s3bench
+usage: s3bench.py [-h] -e ENDPOINT_URL -a ACCESS_KEY -s SECRET_KEY -b
+                         BUCKET_NAME -o OBJECT_SIZE -u ELASTIC_URL -n
+                         NUM_OBJECTS -w WORKLOAD [-c CLEANUP]
+s3bench: error: the following arguments are required: -e/--endpoint-url, -a/--access-key, -s/--secret-key, -b/--bucket-name, -o/--object-size, -u/--elastic-url, -n/--num-objects, -w/--workload
 ```
+Arguments between squrae brackets are optional, the regular ones are required. To enter the man page run the command ``` docker run shonpaz123/s3bench -h ```, for example: 
 
-### And coding style tests
-
-Explain what these tests test and why
-
+``` 
+optional arguments:
+  -h, --help            show this help message and exit
+  -e ENDPOINT_URL, --endpoint-url ENDPOINT_URL
+                        endpoint url for s3 object storage
+  -a ACCESS_KEY, --access-key ACCESS_KEY
+                        access key for s3 object storage
+  -s SECRET_KEY, --secret-key SECRET_KEY
+                        secret key for s3 object storage
+  -b BUCKET_NAME, --bucket-name BUCKET_NAME
+                        s3 bucket name
+  -o OBJECT_SIZE, --object-size OBJECT_SIZE
+                        s3 object size
+  -u ELASTIC_URL, --elastic-url ELASTIC_URL
+                        elastic cluster url
+  -n NUM_OBJECTS, --num-objects NUM_OBJECTS
+                        number of objects to put/get
+  -w WORKLOAD, --workload WORKLOAD
+                        workload running on s3 - read/write
+  -c CLEANUP, --cleanup CLEANUP
+                        should we cleanup all the object that were written
+                        yes/no
 ```
-Give an example
-```
-
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
