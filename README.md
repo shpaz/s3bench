@@ -69,6 +69,9 @@ optional arguments:
 This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data. The dashboard contains: 
 
 * Latency Histogram: 
+<p align="center">
+    <img src="../master/dashboard/Latency.png" alt="Image" width="800" height="600" />
+</p>
 
 ->![Latency Histogram](../master/dashboard/Latency.png)<-
 
