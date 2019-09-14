@@ -70,16 +70,16 @@ This repository provides the ability of importing pre-built kibana dashboard for
 
 * Latency Histogram: 
 
-![Latency Histogram](../master/dashboard/Latency.png)
+![Latency Histogram](../master/dashboard/Latency.png){ width="800" height="600" style="display: block; margin: 0 auto" }
 
 * Throughput Histogram: 
-![Throughput Histogram](../master/dashboard/Throughput.png)
+![Throughput Histogram](../master/dashboard/Throughput.png){ width="800" height="600" style="display: block; margin: 0 auto" }
 
 * Percentile divition: 
-![Percentiles](../master/dashboard/Percentiles.png)
+![Percentiles](../master/dashboard/Percentiles.png){ width="800" height="600" style="display: block; margin: 0 auto" }
 
 * Max Object Latency: 
-![Max Object Latency](../master/dashboard/MaxLatencyObject.png)
+![Max Object Latency](../master/dashboard/MaxLatencyObject.png){ width="800" height="600" style="display: block; margin: 0 auto" }
 
 
 You are more than welcome to add one of your own ... ;)
