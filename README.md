@@ -1,4 +1,4 @@
-## S3 Performance Analyzer
+## S3Bench
 
 This project contains a container-based tool for benchmarking and visualizing various S3 workloads. This tool can be run on-premise, on the cloud etc (as long as storage backend provides native S3 API).
 
