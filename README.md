@@ -70,23 +70,24 @@ This repository provides the ability of importing pre-built kibana dashboard for
 
 * Latency Histogram: 
 
-<p align="center">
+<p align="left">
     <img src="../master/dashboard/Latency.png" alt="Image" width="400" height="300" />
 </p>
 
-<p align="center">
+<p align="left">
     <img src="../master/dashboard/Throughput.png" alt="Image" width="400" height="300" />
 </p>
 
-<p align="center">
-    <img src="../master/dashboard/Percentiles.png" alt="Image" width="400" height="300" />
+<p align="left">
+    <img src="../master/dashboard/Percentiles.png" alt="Image" width="800" height="300" />
 </p>
 
-<p align="center">
+<p align="left">
     <img src="../master/dashboard/MaxLatencyObject.png" alt="Image" width="400" height="300" />
 </p>
 
 You are more than welcome to add one of your own ... ;)
+
 To import the dashboard please go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.json file. 
 
 ## Built With
