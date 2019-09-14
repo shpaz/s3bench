@@ -79,7 +79,7 @@ This repository provides the ability of importing pre-built kibana dashboard for
 ![Percentiles](../master/dashboard/Percentiles.png)
 
 * Max Object Latency: 
-![Max Object Latency](../master/dashboard/MaxObjectLatency.png)
+![Max Object Latency](../master/dashboard/MaxLatencyObject.png)
 
 
 You are more than welcome to add one of your own ... ;)
