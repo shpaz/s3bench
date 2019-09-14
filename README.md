@@ -64,19 +64,24 @@ optional arguments:
                         should we cleanup all the object that were written
                         yes/no
 ```
-## Deployment
+## Results Analysis
 
-Add additional notes about how to deploy this on a live system
+This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data. The dashboard contains: 
+
+* Latency Histogram 
+* Throughput Histogram 
+* Percentile divition 
+* Max Object Latency 
+
+You are more than welcome to add one of your own ... ;)
 
 ## Built With
 
 * [Docker Cloud](https://cloud.docker.com/) - used for automated build out of web-hooked source code. 
 
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
 ## Versioning
+
+Build versions are handled through docker cloud. 
 
 Supported versions for infrastructure components are: 
 - ELK stack < 7.0
