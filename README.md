@@ -74,6 +74,7 @@ This repository provides the ability of importing pre-built kibana dashboard for
 * Max Object Latency 
 
 You are more than welcome to add one of your own ... ;)
+To import the dashboard please go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.json file. 
 
 ## Built With
 
