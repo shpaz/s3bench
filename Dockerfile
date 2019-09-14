@@ -1,14 +1,12 @@
 # choose python image
 FROM python
 
-# add script to execution path
-ADD objectAnalyzer.py /
-
 # install needed pip packages
-RUN pip install boto3
-RUN pip install elasticsearch
-RUN pip install humanfriendly
-RUN pip install argparse
+RUN mkdir /code
+WORKDIR /code
+ADD objectAnalyzer.py /code/
+ADD requirements.txt /code/
+RUN pip install -r requirements.txt
 
 # run script from entry point
 ENTRYPOINT [ "python", "./objectAnalyzer.py" ]
