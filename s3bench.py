@@ -7,7 +7,6 @@ import boto3
 import datetime
 import time
 import humanfriendly
-import json
 from elasticsearch import Elasticsearch
 import socket
 import argparse
@@ -201,7 +200,7 @@ if __name__ == '__main__':
     elif object_analyzer.get_workload() == "read":
 
         # gathers a list of the wanted objects
-        objects = object_analyzer.list_objects(object_analyzer.num_objects)
+        objects = object_analyzer.list_objects(object_analyzer.get_objects_num())
 
         # reads wanted number of objects to the bucket
         for obj in objects['Contents']:
