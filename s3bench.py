@@ -33,6 +33,7 @@ class ObjectAnalyzer:
         parser.add_argument('-n', '--num-objects', help='number of objects to put/get', required=True)
         parser.add_argument('-w', '--workload', help='workload running on s3 - read/write', required=True)
         parser.add_argument('-c', '--cleanup', help='should we cleanup all the object that were written yes/no', required=False)
+        parser.add_argument('-k', '--kaz', help='test kaz auto deploy', required=False)
 
         # parsing all arguments
         args = parser.parse_args()
