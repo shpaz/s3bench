@@ -10,7 +10,7 @@ git clone https://github.com/shonpaz123/s3bench.git
 ```
 ### Prerequisites
 
-To use this tool, you should have a running ELK cluster and a S3 based service. 
+To use this tool, you should have a running ELK stack and a S3 based service. 
 
 ### Installing
 
