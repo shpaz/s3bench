@@ -6,7 +6,7 @@ This project contains a container-based tool for benchmarking and visualizing va
 
 To start using analyzer, please clone this git repostory: 
 ```
-git clone https://github.com/shonpaz123/s3bencher.git
+git clone https://github.com/shonpaz123/s3bench.git
 ```
 ### Prerequisites
 
