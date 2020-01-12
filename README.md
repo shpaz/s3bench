@@ -64,6 +64,19 @@ optional arguments:
                         should we cleanup all the object that were written
                         yes/no
 ```
+
+To run this tool with docker-compose you could run ``` docker-compose up --scale s3bench=X -d ``` (where X is number of wanted replicas), docker-compose.yml file contains all needed arguments to be passed in order to commit the wanted workload to s3. 
+
+For example: 
+``` 
+docker-compose up --scale s3bench=5 -d
+Recreating s3bench_s3bench_1 ... done
+Creating s3bench_s3bench_2   ... done
+Creating s3bench_s3bench_3   ... done
+Creating s3bench_s3bench_4   ... done
+Creating s3bench_s3bench_5   ... done
+```
+
 ## Results Analysis
 
 This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data, how-to is provided in the next section. The dashboard will appear on kibana's dashboard section in the name 'Demo'.
