@@ -96,6 +96,34 @@ You are more than welcome to add one of your own ... ;)
 
 To import the dashboard please go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.json file. 
 
+## Tutorial
+
+Below example shows how to setup a local environment to benchmark a local Ceph Rados Gateway
+
+Start Elastic:
+
+```shell
+sudo docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+
+sudo docker ps
+CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+7ed851e60565        docker.elastic.co/elasticsearch/elasticsearch:6.5.4   "/usr/local/bin/do..."   29 minutes ago      Up 29 minutes       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   dreamy_murdock
+```
+
+Run the benchmark (note the _CONTAINER ID_ from above):
+
+```shell
+sudo docker run --link 7ed851e60565:elasticsearch shonpaz123/s3bench -e http://$(hostname):8000 -a ${ACCESS_KEY} -s ${SECRET_KEY} -b s3bench -o 65536 -n 1000000 -w write -c no -u elasticsearch:9200
+```
+
+Run and connect to Kibana:
+
+```shell
+sudo docker run --link 7ed851e60565:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:6.5.4
+
+firefox http://127.0.0.1:5601
+```
+
 ## Built With
 
 * [Docker Cloud](https://cloud.docker.com/) - used for automated build out of web-hooked source code. 
