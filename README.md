@@ -95,7 +95,9 @@ This repository provides the ability of importing pre-built kibana dashboard for
 You are more than welcome to add one of your own ... ;)
 
 To import the dashboard you could use the two following methods:
+
 (1) Go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.ndjson file
+
 (2) Run ```curl -X POST "localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@s3_dashboard.ndjson ``` (from dashbaord folder, whrn `localhost` is the kibana server).
 
 
