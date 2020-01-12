@@ -126,13 +126,11 @@ class ObjectAnalyzer:
         mapping = '''
            {
                "mappings": {
-               "doc": {
-                   "properties": {
-                       "timestamp": {
-                       "type": "date"
-                           }
-                       }
-                   }
+                 "properties": {
+                   "timestamp": {
+                    "type": "date"
+                    }
+                 }
                }
            }'''
         if not self.elastic.indices.exists(es_index):
@@ -140,7 +138,7 @@ class ObjectAnalyzer:
 
     ''' This function gets a pre-built json and writes it to elasticsearch'''
     def write_elastic_data(self, **kwargs):
-        self.elastic.index(index='s3-perf-index', doc_type='doc', body=kwargs)
+        self.elastic.index(index='s3-perf-index', body=kwargs)
 
     ''' This function lists objects in a bucket with a given number '''
     def list_objects(self, max_keys):
