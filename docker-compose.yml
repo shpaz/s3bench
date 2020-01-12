@@ -1,0 +1,14 @@
+version: '3.2'
+
+services:
+  s3bench:
+    image: shonpaz123/s3bench
+    command: --endpoint-url http://192.168.1.46
+             --access-key JTV3ND3CVHKHOZ7I6UZ4
+             --secret-key jv9npprh8eoko141F2k7QZlSVKfDM0YAzIowj7Wu
+             --bucket bug
+             --object-size 4096
+             --num-objects 1000
+             --workload read
+             --cleanup no
+             --elastic-url 192.168.1.31:9200
