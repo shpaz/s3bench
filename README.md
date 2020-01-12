@@ -66,32 +66,7 @@ optional arguments:
 ```
 ## Results Analysis
 
-This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data. The dashboard contains: 
-
-* Latency Histogram: 
-
-<p align="left">
-    <img src="../master/dashboard/Latency.png" alt="Image" width="400" height="300" />
-</p>
-
-* Throughput Histogram: 
-
-<p align="left">
-    <img src="../master/dashboard/Throughput.png" alt="Image" width="400" height="300" />
-</p>
-
-* Percentile Histogram: 
-
-<p align="left">
-    <img src="../master/dashboard/Percentiles.png" alt="Image" width="800" height="300" />
-</p>
-
-* Max Object Latency Histogram: 
-
-<p align="left">
-    <img src="../master/dashboard/MaxLatencyObject.png" alt="Image" width="400" height="300" />
-</p>
-
+This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data, how-to is provided in the next section. The dashboard will appear on kibana's dashboard section in the name 'Demo'.
 You are more than welcome to add one of your own ... ;)
 
 ### Dashboard Import
@@ -103,18 +78,18 @@ To import the dashboard you could use the two following methods:
 (2) Run ```curl -X POST "localhost:5601/api/saved_objects/_import" -H "kbn-xsrf: true" --form file=@s3_dashboard.ndjson ``` (from dashbaord folder, whrn `localhost` is the kibana server).
 
 
-## Tutorial
+## Running local ELK stack to visualize metrics
 
-Below example shows how to setup a local environment to benchmark a local Ceph Rados Gateway
+Below example shows how to setup a local environment to benchmark a local Ceph Rados Gateway (using Docker CLI) 
 
 Start Elastic:
 
 ```shell
-sudo docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+sudo docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "xpack.security.enabled=false" docker.elastic.co/elasticsearch/elasticsearch:7.5
 
 sudo docker ps
 CONTAINER ID        IMAGE                                                 COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-7ed851e60565        docker.elastic.co/elasticsearch/elasticsearch:6.5.4   "/usr/local/bin/do..."   29 minutes ago      Up 29 minutes       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   dreamy_murdock
+7ed851e60565        docker.elastic.co/elasticsearch/elasticsearch:7.5   "/usr/local/bin/do..."   29 minutes ago      Up 29 minutes       0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   dreamy_murdock
 ```
 
 Run the benchmark (note the _CONTAINER ID_ from above):
@@ -126,8 +101,16 @@ sudo docker run --link 7ed851e60565:elasticsearch shonpaz123/s3bench -e http://$
 Run and connect to Kibana:
 
 ```shell
-sudo docker run --link 7ed851e60565:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:6.5.4
+sudo docker run --link 7ed851e60565:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:7.5
 
+firefox http://127.0.0.1:5601
+```
+
+Below example shows how to setup a local environment to benchmark a local Ceph Rados Gateway (using Docker Compose)
+
+Refer to https://github.com/deviantony/docker-elk.git repository and follow the instructions to run ELK stack in version 7.5 via docker-compose tool. 
+
+```shell
 firefox http://127.0.0.1:5601
 ```
 
