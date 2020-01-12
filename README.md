@@ -94,6 +94,8 @@ This repository provides the ability of importing pre-built kibana dashboard for
 
 You are more than welcome to add one of your own ... ;)
 
+### Dashboard Import
+
 To import the dashboard you could use the two following methods:
 
 (1) Go to kibana Management -> Saved Objects -> Import and upload the json s3_dashboard.ndjson file
@@ -138,7 +140,7 @@ firefox http://127.0.0.1:5601
 Build versions are handled through docker cloud. 
 
 Supported versions for infrastructure components are: 
-- ELK stack < 7.0
+- ELK stack == 7.5
 
 ## Authors
 
