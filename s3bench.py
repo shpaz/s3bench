@@ -50,7 +50,7 @@ class ObjectAnalyzer:
         self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, aws_access_key_id=self.access_key,
                                aws_secret_access_key=self.secret_key)
-        self.elastic = Elasticsearch(self.elastic_cluster)
+        self.elastic = Elasticsearch(self.elastic_cluster, verify_certs=False)
         self.cleanup_list = []
 
     ''' This function checks for bucket existence '''
