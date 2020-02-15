@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: s3bench
+spec:
+  parallelism: 10
+  template:
+    metadata: 
+      name: s3bench
+    spec: 
+      containers:
+        - image: shonpaz123/s3bench
+          name: s3bench
+          args:
+               ["--endpoint-url", "http://rook-ceph-rgw-my-store.rook-ceph.svc.cluster.local",
+                "--access-key", "ACCESS_KEY", 
+                "--secret-key", "SECRET_KEY",
+                "--bucket", "bug",
+                "--object-size", "4096", 
+                "--num-objects", "1000",
+                "--workload", "write",
+                "--cleanup", "no",
+                "--elastic-url", "http://elasticsearch:9200"]
+      restartPolicy: Never

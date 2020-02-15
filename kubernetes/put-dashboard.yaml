@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: put-dashboard
+spec:
+  template:
+    spec:
+      containers:
+      - name: put-dashboard
+        image: theithollow/hollowapp-blog:curl
+        args:
+        - /bin/sh
+        - -c
+        - "curl -X POST kibana:5601/api/saved_objects/_import -H 'kbn-xsrf: true' --form file=@/tmp/dashboard/s3_dashboard.ndjson"
+        volumeMounts:
+        - name: s3-dashboard
+          mountPath: /tmp/dashboard
+      restartPolicy: OnFailure
+      volumes:
+      - name: s3-dashboard
+        configMap:
+          name: s3-dashboard-configmap
