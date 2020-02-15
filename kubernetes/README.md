@@ -1,4 +1,4 @@
-## s3bench Kubernetes Demo 
+## s3bench Kubernetes Tutorial 
 
 This demo contains a full ecosystem deployment for running s3bench performance benchmark on rook as object storage backend and elasticsearch as a document based database for visualizations. 
 
@@ -7,7 +7,7 @@ This demo contains a full ecosystem deployment for running s3bench performance b
 To start using s3bench, please clone this git repostory and move to the kubernetes directory: 
 ```
 git clone https://github.com/shonpaz123/s3bench.git
-cd kubernetes
+cd s3bench/kubernetes/
 ```
 ### Prerequisites
 
@@ -22,8 +22,8 @@ To build the image:
 
 To run this tool, first lets prepare the environment needed for us to run the benchmarks. To do this automatically, please run `prepare_env.sh` script which deployes S3 service based on rook-ceph and an ELK stack. This script is synchronous and waits for all services to be available before it exists. To ensure all services are up and running you could port-forward Kibana and rook S3 to localhost: 
 ```
-kubectl port-forward service/kibana 5601
-kubectl port-forward service/my-store-rgw 80  
+kubectl port-forward service/kibana 5601 &
+kubectl port-forward service/rook-ceph-rgw-my-store 80 -n rook-ceph & 
 
 ```
 Now access both of the ports using your web browser. http://127.0.0.1, http://127.0.0.1:5601
