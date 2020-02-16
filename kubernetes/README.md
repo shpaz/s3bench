@@ -56,7 +56,8 @@ Supported versions for infrastructure components are:
 * **Shon Paz** - *Initial work* - [shonpaz123](https://github.com/shonpaz123)
 
 ## Future Plans 
-- Support for K8S and docker-compose 
+- Support for Object Bucket Claim based on Openshift 4.2
+- Support for operator and CRDs for lifecycle management 
 
 ## Acknowledgments
 
