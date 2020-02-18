@@ -143,7 +143,7 @@ Supported versions for infrastructure components are:
 * **Shon Paz** - *Initial work* - [shonpaz123](https://github.com/shonpaz123)
 
 ## Future Plans 
-- Support for K8S and docker-compose 
+- Support for Bucket Provisioning supported by OCP>=4.2
 
 ## Acknowledgments
 
