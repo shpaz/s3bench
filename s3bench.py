@@ -180,8 +180,11 @@ class ObjectAnalyzer:
             # returns a slice of keys list according to num_objects var
             return circular_keys[random_object_index:random_object_index + int(self.num_objects)] 
 
-        # in case there is no need for pagination
-        return objects['Contents']      
+        # in case there is no need for pagination and there are objects to read in the bucket 
+        if 'Contents' in objects:
+            return objects['Contents']
+        else:
+            raise Exception("no objects to read in bucket!")
 
 if __name__ == '__main__':
 
