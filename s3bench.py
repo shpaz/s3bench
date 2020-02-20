@@ -11,6 +11,8 @@ from elasticsearch import Elasticsearch
 import socket
 import argparse
 import uuid
+import random 
+import itertools 
 
 TO_STRING = 'a'
 
@@ -150,13 +152,43 @@ class ObjectAnalyzer:
         for object_name in self.cleanup_list:
             self.s3.delete_object(Bucket=self.bucket_name, Key=object_name)
 
+    ''' This function returns randomized list of object in a bucket according to a given number 
+        In case number is bigger than 1000, use pagination, else use regular v2'''
+    def list_random_objects(self): 
+        
+        # in case number of objects is smaller then the page size, to save list costs
+        if int(self.num_objects) <= 1000: 
+            objects = self.s3.list_objects(Bucket=self.bucket_name, MaxKeys=int(self.num_objects))
+            
+        else:
+            keys = []
+    
+            # uses pagination to list object number bigger then 1000
+            paginator = self.s3.get_paginator('list_objects')
+            pages = paginator.paginate(Bucket=self.bucket_name)
+            for page in pages:
+                for obj in page['Contents']:
+                    keys.append({'Key':obj['Key'], 'Size':obj['Size']})
+    
+            # shuffles keys list randomly to create different list between clients
+            random.shuffle(keys)
+            # picks a random object from the list 
+            random_object_index = keys.index(random.choice(keys))
+            # creates a circular list for list index deviation 
+            circular_keys = keys + keys
+            
+            # returns a slice of keys list according to num_objects var
+            return circular_keys[random_object_index:random_object_index + int(self.num_objects)] 
+
+        # in case there is no need for pagination
+        return objects['Contents']      
 
 if __name__ == '__main__':
 
     # creates an object analyzer instance from class
     object_analyzer = ObjectAnalyzer()
 
-    # prepare elasticsearch index for writing
+    # prepares elasticsearch index for writing
     object_analyzer.prepare_elastic_index()
 
     # checks for bucket existence, creates if doesn't exist
@@ -172,10 +204,10 @@ if __name__ == '__main__':
         # writes wanted number of objects to the bucket
         for index in range(object_analyzer.get_objects_num()):
 
-            # generate new object's name
+            # generates new object's name
             object_name = object_analyzer.generate_object_name()
 
-            # time put operation
+            # times put operation
             latency = object_analyzer.time_operation('PUT', object_name=object_name, bin_data=data)
 
             # gets object size in bytes
@@ -184,7 +216,7 @@ if __name__ == '__main__':
             # calculates throughput per request
             throughput = object_analyzer.calcuate_throughput(latency, size_in_bytes)
 
-            # write data to elasticsearch
+            # writes data to elasticsearch
             object_analyzer.write_elastic_data(latency=latency,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
@@ -198,27 +230,28 @@ if __name__ == '__main__':
     elif object_analyzer.get_workload() == "read":
 
         # gathers a list of the wanted objects
-        objects = object_analyzer.list_objects(object_analyzer.get_objects_num())
+        objects = object_analyzer.list_random_objects()
 
         # reads wanted number of objects to the bucket
-        for obj in objects['Contents']:
+        for obj in objects:
 
-            # sets the object's name
+            # sets relevant variables 
             object_name = obj['Key']
+            object_size = obj['Size']
 
             # gathers latency from get operation
             latency = object_analyzer.time_operation('GET', object_name, "")
 
-            # get the object size parsed
-            size = humanfriendly.format_size(obj['Size'])
+            # gets the object size parsed
+            size = humanfriendly.format_size(object_size)
 
             # gets the size of bytes
-            size_in_bytes = obj['Size']
+            size_in_bytes = object_size
 
             # calculates throughput
             throughput = object_analyzer.calcuate_throughput(latency, size_in_bytes)
 
-            # write data to elasticsearch
+            # writes data to elasticsearch
             object_analyzer.write_elastic_data(latency=latency,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
@@ -227,5 +260,6 @@ if __name__ == '__main__':
                                                object_name=object_name,
                                                throughput=throughput,
                                                source=socket.gethostname())
+    # in case cleanup is chosen
     if object_analyzer.get_cleanup() == "yes": 
             object_analyzer.objects_cleanup()
