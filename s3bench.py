@@ -13,6 +13,7 @@ import argparse
 import uuid
 import random 
 import itertools 
+from botocore.client import ClientError
 
 TO_STRING = 'a'
 
@@ -57,9 +58,11 @@ class ObjectAnalyzer:
 
     ''' This function checks for bucket existence '''
     def check_bucket_existence(self):
-        if self.bucket_name in self.s3.list_buckets()['Buckets']:
+        try: 
+            self.s3.head_bucket(Bucket=self.bucket_name)
             return True
-        return False
+        except ClientError:
+            return False
 
     ''' This function creates bucket according the the user's input '''
     def create_bucket(self):
