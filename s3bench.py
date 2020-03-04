@@ -198,7 +198,7 @@ if __name__ == '__main__':
     object_analyzer.prepare_elastic_index()
 
     # checks for bucket existence, creates if doesn't exist
-    if not object_analyzer.check_bucket_existence():
+    if not object_analyzer.check_bucket_existence() and object_analyzer.get_workload() == "write":
         object_analyzer.create_bucket()
 
     # creates binary data
