@@ -3,12 +3,15 @@ version: '3.2'
 services:
   s3bench:
     image: shonpaz123/s3bench
-    command: --endpoint-url http://192.168.1.46
-             --access-key JTV3ND3CVHKHOZ7I6UZ4
-             --secret-key jv9npprh8eoko141F2k7QZlSVKfDM0YAzIowj7Wu
-             --bucket bug
-             --object-size 4096
-             --num-objects 1000
-             --workload read
+    command: --endpoint-url http://rook-ceph-rgw-my-store-rook-ceph.apps-crc.testing
+             --access-key PX1VBN1W4N184FKJU6Z9
+             --secret-key phrBrYDvSsIKdyhQEFBp3WeWxyk5C4xDPKZ0hjJj
+             --bucket benchmarks
+             --object-size 2MiB
+             --num-objects 100
+             --workload write
              --cleanup no
-             --elastic-url 192.168.1.31:9200
+             --elastic-url http://elasticsearch:9200
+    networks:
+      - elk
+

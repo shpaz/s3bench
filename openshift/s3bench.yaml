@@ -1,0 +1,86 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: s3bench-template
+objects: 
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: s3bench
+    spec:
+      parallelism: "${{REPLICAS}}"
+      template:
+        metadata: 
+          name: s3bench
+        spec: 
+          containers:
+            - image: "${{IMAGE}}"
+              name: s3bench
+              args:
+                   ["--endpoint-url", "${{ENDPOINT_URL}}",
+                    "--access-key",   "${{ACCESS_KEY}}", 
+                    "--secret-key",   "${{SECRET_KEY}}",
+                    "--bucket",       "${{BUCKET_NAME}}",
+                    "--object-size",  "${{OBJECT_SIZE}}", 
+                    "--num-objects",  "${NUM_OBJECTS}",
+                    "--workload",     "${{WORKLOAD}}",
+                    "--cleanup",      "${{CLEANUP}}",
+                    "--elastic-url",  "${{ELASTIC_URL}}"]
+          restartPolicy: Never
+
+parameters: 
+  - name: IMAGE
+    displayName: S3 BENCH IMAGE
+    description: Represents the container image used with s3bench tool 
+    value: "shonpaz123/s3bench"
+
+  - name: ACCESS_KEY
+    displayName: AWS ACCESS KEY
+    description: Represents aws acceess secret key used for S3 credentials
+    value: "accesskey-changeme"
+
+  - name: SECRET_KEY
+    displayName: AWS SECRET KEY
+    description: Represents aws secret secret key used for S3 credentials
+    value: "secretkey-changeme"
+
+  - name: REPLICAS
+    displayName: REPLICAS 
+    description: Represents the number of parallel processes the job will use 
+    value: "3"
+
+  - name: ENDPOINT_URL 
+    displayName: ENDPOINT URL 
+    description: Represents the endpoint url for S3 operations 
+    value: "endpointurl-changeme"
+
+  - name: BUCKET_NAME
+    displayName: BUCKET NAME 
+    description: Represents the bucket name used for S3 operations 
+    value: "bucket-changeme"
+
+  - name: OBJECT_SIZE 
+    displayName: OBJECT SIZE
+    description: Represents the object size, can be reffered in KB/KiB/MB/MiB/GB/GiB
+    value: "2MiB"
+
+  - name: WORKLOAD
+    displayName: WORKLOAD
+    description: Represents the workload type, read/write 
+    value: "write"
+
+  - name: NUM_OBJECTS
+    displayName: NUM OBJECTS 
+    description: Represents the number of objects required for each job workload 
+    value: "100"
+
+  - name: CLEANUP
+    displayName: CLEANUP
+    description: wheter objects will be deleted or not 
+    value: "no"
+
+  - name: ELASTIC_URL
+    displayName: ELASTIC URL 
+    description: Represents the elastic search url
+    value: "elasticurl-chagneme"
+

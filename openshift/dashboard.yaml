@@ -1,0 +1,33 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: s3bench-template
+objects: 
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: dashboard
+    spec:
+      template:
+        spec:
+          containers:
+          - name: dashboard
+            image: theithollow/hollowapp-blog:curl
+            args:
+            - /bin/sh
+            - -c
+            - "curl -X POST -k ${KIBANA_URL}/api/saved_objects/_import -H 'kbn-xsrf: true' --form file=@/tmp/dashboard/s3_dashboard.ndjson"
+            volumeMounts:
+            - name: s3-dashboard
+              mountPath: /tmp/dashboard
+          restartPolicy: OnFailure
+          volumes:
+          - name: s3-dashboard
+            configMap:
+              name: s3-dashboard-configmap
+
+parameters: 
+  - name: KIBANA_URL
+    displayName: KIBANA URL 
+    description: Represents the kibana url for visualizations  
+    value: "kibana:5601"
