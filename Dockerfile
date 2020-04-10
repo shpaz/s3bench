@@ -1,12 +1,33 @@
-# choose python image
-FROM python:3.8-slim-buster
+# Phase I - Builder source
+FROM python:latest as builder
 
-# install needed pip packages
-RUN mkdir /code
+WORKDIR /usr/src/app
+
+COPY s3bench.py ./
+COPY requirements.txt ./
+COPY pylint.cfg ./
+
+WORKDIR /wheels
+
+RUN cp /usr/src/app/requirements.txt ./
+RUN pip wheel -r ./requirements.txt 
+
+# Phase II - Lints Code 
+FROM eeacms/pylint:latest as linting
 WORKDIR /code
-COPY s3bench.py /code/
-COPY requirements.txt /code/
-RUN pip3 install -r requirements.txt
+COPY --from=builder /usr/src/app/pylint.cfg /etc/pylint.cfg
+COPY --from=builder /usr/src/app/s3bench.py ./
+RUN ["/docker-entrypoint.sh", "pylint"]
 
-# run script from entry point
-ENTRYPOINT [ "python3", "./s3bench.py" ]
+# Phase III - Final Image 
+FROM python:3.8-slim as serve
+WORKDIR /usr/src/app
+# Copy all packages instead of rerunning pip install
+COPY --from=builder /wheels /wheels
+RUN     pip install -r /wheels/requirements.txt \
+                      -f /wheels \
+       && rm -rf /wheels \
+       && rm -rf /root/.cache/pip/* 
+
+COPY --from=builder /usr/src/app/*.py ./
+ENTRYPOINT ["python3", "./s3bench.py"]
