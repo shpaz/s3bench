@@ -1,5 +1,5 @@
 # choose python image
-FROM python:3
+FROM python:3.8-slim-buster
 
 # install needed pip packages
 RUN mkdir /code
@@ -9,4 +9,4 @@ COPY requirements.txt /code/
 RUN pip3 install -r requirements.txt
 
 # run script from entry point
-ENTRYPOINT [ "python", "./s3bench.py" ]
+ENTRYPOINT [ "python3", "./s3bench.py" ]
