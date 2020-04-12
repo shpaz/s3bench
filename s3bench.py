@@ -14,6 +14,7 @@ import random
 import boto3
 import humanfriendly
 from elasticsearch import Elasticsearch
+import elasticsearch.helpers
 from botocore.client import ClientError
 
 TO_STRING = 'a'
@@ -133,6 +134,12 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         """This method parses time into kibana timestamp"""
         return round(time.time() * 1000)
 
+    @classmethod
+    def create_generator(cls, bulk_list):
+        """This method creates a generator object from a given json"""
+        for entry in bulk_list:
+            yield entry
+
     def prepare_elastic_index(self):
         """This function prepares elasticsearch index for writing"""
         es_index = 's3-perf-index'
@@ -149,9 +156,14 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         if not self.elastic.indices.exists(es_index):
             self.elastic.indices.create(index=es_index, body=mapping)
 
-    def write_elastic_data(self, **kwargs):
+    def write_elastic_data(self, bulk):
         """This function gets a pre-built json and writes it to elasticsearch"""
-        self.elastic.index(index='s3-perf-index', body=kwargs)
+        for success, info in elasticsearch.helpers.parallel_bulk(client=self.elastic,
+                                                                 actions=self.create_generator(bulk),
+                                                                 thread_count=8):
+            if not success:
+                print('Article indexing failed ', info)
+        print "ARTICLES INDEXED"   
 
     def objects_cleanup(self):
         """This function deletes all objects created within the workload"""
@@ -188,6 +200,9 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
 
 if __name__ == '__main__':
 
+    BULK_DATA = []
+    BULK_MAX_ENTRIES = 100
+
     # creates an object analyzer instance from class
     object_analyzer = ObjectAnalyzer() #pylint: disable=invalid-name
 
@@ -198,14 +213,14 @@ if __name__ == '__main__':
     if not object_analyzer.check_bucket_existence() and object_analyzer.get_workload() == "write":
         object_analyzer.create_bucket()
 
-    # creates binary data
+    # creates in-memory data
     DATA = object_analyzer.create_bin_data()
 
     # verifies that user indeed wants to write
     if object_analyzer.get_workload() == "write":
 
         # writes wanted number of objects to the bucket
-        for index in range(object_analyzer.get_objects_num()):
+        for index in range(1, object_analyzer.get_objects_num() + 1):
 
             # generates new object's name
             object_name_given = object_analyzer.generate_object_name()
@@ -220,15 +235,26 @@ if __name__ == '__main__':
             # calculates throughput per request
             throughput = object_analyzer.calcuate_throughput(duration, size_in_bytes)
 
-            # writes data to elasticsearch
-            object_analyzer.write_elastic_data(latency=duration,
-                                               timestamp=object_analyzer.create_timestamp(),
-                                               workload=object_analyzer.get_workload(),
-                                               size=object_analyzer.object_size,
-                                               size_in_bytes=size_in_bytes,
-                                               throughput=throughput,
-                                               object_name=object_name_given,
-                                               source=socket.gethostname())
+            # in case we have reached the BULK_MAX_ENTRIES mark
+            if (index % BULK_MAX_ENTRIES) == 0:
+                # create a generator to save memory costs, and write it to elastic 
+                #generator = object_analyzer.create_generator(BULK_DATA)
+                object_analyzer.write_elastic_data(BULK_DATA)
+                # zero list for next iterations 
+                BULK_DATA = []
+            # appends data to the list as long as it didn't reach BULK_MAX_ENTRIES 
+            else:
+                BULK_DATA.append({"_index": "s3-perf-index",
+                                 "_type": "_doc", 
+                                 "_source": {
+                                 "latency":duration,
+                                 "timestamp":object_analyzer.create_timestamp(),
+                                 "workload":object_analyzer.get_workload(),
+                                 "size":object_analyzer.object_size,
+                                 "size_in_bytes":size_in_bytes,
+                                 "throughput":throughput,
+                                 "object_name":object_name_given,
+                                 "source":socket.gethostname()}})
 
     # in case the user chosen read operation
     elif object_analyzer.get_workload() == "read":
