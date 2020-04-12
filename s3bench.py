@@ -11,13 +11,18 @@ import socket
 import argparse
 import uuid
 import random
+import logging
 import boto3
 import humanfriendly
 from elasticsearch import Elasticsearch
 import elasticsearch.helpers
 from botocore.client import ClientError
 
-TO_STRING = 'a'
+TO_STRING = 'a' # initial data for im-memory operation
+FORMAT = '%(asctime)-15s %(message)s' # logging global format
+logging.basicConfig(format=FORMAT)
+BULK_DATA = [] # list contains bulk temporary data
+
 
 class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
     """This class creates object analyzer objects, these objects are provided with pre-writen
@@ -42,6 +47,9 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         parser.add_argument('-c', '--cleanup',
                             help='should we cleanup all the object that were written yes/no',
                             required=False)
+        parser.add_argument('-bme', '--bulk-max-entries',
+                            help='maximum number of documents per bulk operation',
+                            required=True)
 
         # parsing all arguments
         args = parser.parse_args()
@@ -62,6 +70,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
                                aws_secret_access_key=self.secret_key)
         self.elastic = Elasticsearch(self.elastic_cluster, verify_certs=False)
         self.cleanup_list = []
+        self.bulk_max_entries = args.bulk_max_entries
 
     def check_bucket_existence(self):
         """This function checks for bucket existence"""
@@ -104,6 +113,10 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
     def get_objects_num(self):
         """This function return number of iterations"""
         return int(self.num_objects)
+
+    def get_bulk_max_entries(self):
+        """This function return number of max documents per bulk operation"""
+        return int(self.bulk_max_entries)
 
     def get_workload(self):
         """This function returns workload"""
@@ -155,6 +168,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
            }'''
         if not self.elastic.indices.exists(es_index):
             self.elastic.indices.create(index=es_index, body=mapping)
+            logging.warning('created index mapping for index %s', es_index)
 
     def write_elastic_data(self, bulk):
         """This function gets a pre-built json and writes it to elasticsearch"""
@@ -162,8 +176,16 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
                                                                  actions=self.create_generator(bulk),
                                                                  thread_count=8):
             if not success:
-                print('Article indexing failed ', info)
-        print "ARTICLES INDEXED"   
+                logging.warning('document indexing failed, document is: %s', info)
+
+    @classmethod
+    def build_document(cls, json):
+        """This function prepares elasticsearch index for writing"""
+        return {
+                    "_index": "s3-perf-index",
+                    "_type": "_doc",
+                    "_source": json
+                }
 
     def objects_cleanup(self):
         """This function deletes all objects created within the workload"""
@@ -200,9 +222,6 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
 
 if __name__ == '__main__':
 
-    BULK_DATA = []
-    BULK_MAX_ENTRIES = 100
-
     # creates an object analyzer instance from class
     object_analyzer = ObjectAnalyzer() #pylint: disable=invalid-name
 
@@ -235,38 +254,43 @@ if __name__ == '__main__':
             # calculates throughput per request
             throughput = object_analyzer.calcuate_throughput(duration, size_in_bytes)
 
+            # build document suitable for parallel bulk import format
+            es_document = object_analyzer.build_document({
+                                             "latency":duration,
+                                             "timestamp":object_analyzer.create_timestamp(),
+                                             "workload":object_analyzer.get_workload(),
+                                             "size":object_analyzer.object_size,
+                                             "size_in_bytes":size_in_bytes,
+                                             "throughput":throughput,
+                                             "object_name":object_name_given,
+                                             "source":socket.gethostname()
+                                        })
+
             # in case we have reached the BULK_MAX_ENTRIES mark
-            if (index % BULK_MAX_ENTRIES) == 0:
-                # create a generator to save memory costs, and write it to elastic 
-                #generator = object_analyzer.create_generator(BULK_DATA)
+            if (index % object_analyzer.get_bulk_max_entries()) == 0:
+                # create a generator to save memory costs, and write it to elastic
+                BULK_DATA.append(es_document)
                 object_analyzer.write_elastic_data(BULK_DATA)
-                # zero list for next iterations 
+                # zero list for next iterations
                 BULK_DATA = []
-            # appends data to the list as long as it didn't reach BULK_MAX_ENTRIES 
+
+            # appends data to the list as long as it didn't reach BULK_MAX_ENTRIES
             else:
-                BULK_DATA.append({"_index": "s3-perf-index",
-                                 "_type": "_doc", 
-                                 "_source": {
-                                 "latency":duration,
-                                 "timestamp":object_analyzer.create_timestamp(),
-                                 "workload":object_analyzer.get_workload(),
-                                 "size":object_analyzer.object_size,
-                                 "size_in_bytes":size_in_bytes,
-                                 "throughput":throughput,
-                                 "object_name":object_name_given,
-                                 "source":socket.gethostname()}})
+                BULK_DATA.append(es_document)
+
+        # writes the carry documents left from % operations
+        object_analyzer.write_elastic_data(BULK_DATA)
 
     # in case the user chosen read operation
     elif object_analyzer.get_workload() == "read":
 
         # gathers a list of the wanted objects
         OBJECTS_LIST = object_analyzer.list_random_objects()
-
         # reads wanted number of objects to the bucket
-        for entity in OBJECTS_LIST:
+        for index in range(1, len(OBJECTS_LIST) + 1):
             # sets relevant variables
-            object_name_given = entity['Key']
-            object_size = entity['Size']
+            object_name_given = OBJECTS_LIST[index - 2]['Key']
+            object_size = OBJECTS_LIST[index -2]['Size']
 
             # gathers latency from get operation
             duration = object_analyzer.time_operation('GET', object_name_given, "")
@@ -280,15 +304,32 @@ if __name__ == '__main__':
             # calculates throughput
             throughput = object_analyzer.calcuate_throughput(duration, size_in_bytes)
 
-            # writes data to elasticsearch
-            object_analyzer.write_elastic_data(latency=duration,
-                                               timestamp=object_analyzer.create_timestamp(),
-                                               workload=object_analyzer.get_workload(),
-                                               size_in_bytes=size_in_bytes,
-                                               size=size,
-                                               object_name=object_name_given,
-                                               throughput=throughput,
-                                               source=socket.gethostname())
+            # build document suitable for parallel bulk import format
+            es_document = object_analyzer.build_document({
+                                             "latency":duration,
+                                             "timestamp":object_analyzer.create_timestamp(),
+                                             "workload":object_analyzer.get_workload(),
+                                             "size":object_analyzer.object_size,
+                                             "size_in_bytes":size_in_bytes,
+                                             "throughput":throughput,
+                                             "object_name":object_name_given,
+                                             "source":socket.gethostname()
+                                        })
+
+            # in case we have reached the BULK_MAX_ENTRIES mark
+            if (index % object_analyzer.get_bulk_max_entries()) == 0:
+                # create a generator to save memory costs, and write it to elastic
+                BULK_DATA.append(es_document)
+                object_analyzer.write_elastic_data(BULK_DATA)
+                # zero list for next iterations
+                BULK_DATA = []
+            # appends data to the list as long as it didn't reach BULK_MAX_ENTRIES
+            else:
+                BULK_DATA.append(es_document)
+
+        # writes the carry documents left from % operations
+        object_analyzer.write_elastic_data(BULK_DATA)
+
     # in case cleanup is chosen
     if object_analyzer.get_cleanup() == "yes":
         object_analyzer.objects_cleanup()
