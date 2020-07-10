@@ -35,9 +35,9 @@ To run this tool, you could run ``` docker run shonpaz123/s3bench ``` command to
 ```
 docker run shonpaz123/s3bench
 usage: s3bench.py [-h] -e ENDPOINT_URL -a ACCESS_KEY -s SECRET_KEY -b
-                         BUCKET_NAME -o OBJECT_SIZE -u ELASTIC_URL -n
-                         NUM_OBJECTS -w WORKLOAD [-c CLEANUP]
-s3bench: error: the following arguments are required: -e/--endpoint-url, -a/--access-key, -s/--secret-key, -b/--bucket-name, -o/--object-size, -u/--elastic-url, -n/--num-objects, -w/--workload
+                  BUCKET_NAME -o OBJECT_SIZE -u ELASTIC_URL -n NUM_OBJECTS -w
+                  WORKLOAD [-l MAX_LATENCY] [-c CLEANUP]
+s3bench.py: error: the following arguments are required: -e/--endpoint-url, -a/--access-key, -s/--secret-key, -b/--bucket-name, -o/--object-size, -u/--elastic-url, -n/--num-objects, -w/--workload
 ```
 Arguments between squrae brackets are optional, the regular ones are required. To enter the man page run the command ``` docker run shonpaz123/s3bench -h ```, for example: 
 
@@ -60,6 +60,8 @@ optional arguments:
                         number of objects to put/get
   -w WORKLOAD, --workload WORKLOAD
                         workload running on s3 - read/write
+  -l MAX_LATENCY, --max-latency MAX_LATENCY
+                        max acceptable latency per object operation in ms
   -c CLEANUP, --cleanup CLEANUP
                         should we cleanup all the object that were written
                         yes/no
@@ -108,7 +110,7 @@ CONTAINER ID        IMAGE                                                 COMMAN
 Run the benchmark (note the _CONTAINER ID_ from above):
 
 ```shell
-sudo docker run --link 7ed851e60565:elasticsearch shonpaz123/s3bench -e http://$(hostname):8000 -a ${ACCESS_KEY} -s ${SECRET_KEY} -b s3bench -o 65536 -n 1000000 -w write -c no -u elasticsearch:9200
+sudo docker run --link 7ed851e60565:elasticsearch shonpaz123/s3bench -e http://$(hostname):8000 -a ${ACCESS_KEY} -s ${SECRET_KEY} -b s3bench -o 65536 -n 1000000 -w write -l 10000 -c no -u elasticsearch:9200
 ```
 
 Run and connect to Kibana:
