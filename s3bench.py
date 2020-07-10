@@ -170,7 +170,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
 
     def list_random_objects(self):
         """This function returns randomized list of object in a bucket according to a given number
-        It chooses only objects of sizes specified by the user"""
+        In case number is bigger than 1000, use pagination, else use regular v2"""
         # in case number of objects is smaller then the page size, to save list costs
         if int(self.num_objects) <= 1000:
             objects = self.s3.list_objects(Bucket=self.bucket_name, MaxKeys=int(self.num_objects))
