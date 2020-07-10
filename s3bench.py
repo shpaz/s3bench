@@ -100,6 +100,9 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         """This function generates randomized object name"""
         return str(uuid.uuid4())
 
+    def add_prefix(self, obj_name, obj_size):
+        return str(self.object_size + "/" + obj_name)
+
     def create_bin_data(self):
         """This function creates object data according to user's object size input"""
         return humanfriendly.parse_size(self.object_size) * TO_STRING
@@ -172,29 +175,22 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         """This function returns randomized list of object in a bucket according to a given number
         In case number is bigger than 1000, use pagination, else use regular v2"""
         # in case number of objects is smaller then the page size, to save list costs
-        if int(self.num_objects) <= 1000:
-            objects = self.s3.list_objects(Bucket=self.bucket_name, MaxKeys=int(self.num_objects))
-        else:
-            keys = []
-            # uses pagination to list object number bigger then 1000
-            paginator = self.s3.get_paginator('list_objects')
-            pages = paginator.paginate(Bucket=self.bucket_name)
-            for page in pages:
-                for obj in page['Contents']:
-                    keys.append({'Key':obj['Key'], 'Size':obj['Size']})
-            # shuffles keys list randomly to create different list between clients
-            random.shuffle(keys)
-            # picks a random object from the list
-            random_object_index = keys.index(random.choice(keys))
-            # creates a circular list for list index deviation
-            circular_keys = keys + keys
-            # returns a slice of keys list according to num_objects var
-            return circular_keys[random_object_index:random_object_index + int(self.num_objects)]
-        # in case there is no need for pagination and there are objects to read in the bucket
-        if 'Contents' in objects:
-            return objects['Contents']
-        else:
-            raise Exception("no objects to read in bucket!")
+        keys = []
+        # uses pagination to list object number bigger then 1000
+        paginator = self.s3.get_paginator('list_objects')
+        pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.object_size)
+        for page in pages:
+            for obj in page['Contents']:
+                keys.append({'Key':obj['Key'], 'Size':obj['Size']})
+        # shuffles keys list randomly to create different list between clients
+        random.shuffle(keys)
+        # picks a random object from the list
+        random_object_index = keys.index(random.choice(keys))
+        # creates a circular list for list index deviation
+        circular_keys = keys + keys
+        # returns a slice of keys list according to num_objects var
+        return circular_keys[random_object_index:random_object_index + int(self.num_objects)]
+
 
 if __name__ == '__main__':
 
@@ -220,8 +216,13 @@ if __name__ == '__main__':
             # generates new object's name
             object_name_given = object_analyzer.generate_object_name()
 
+            # add prefix to object name according its size
+            object_name_with_prefix = object_analyzer.add_prefix(
+                                        obj_name=object_name_given,
+                                        obj_size=object_analyzer.object_size)
+
             # times put operation
-            duration = object_analyzer.time_operation('PUT', object_name=object_name_given,
+            duration = object_analyzer.time_operation('PUT', object_name=object_name_with_prefix,
                                                       bin_data=DATA)
 
             # check if operation duration exceeded user-specified duration
