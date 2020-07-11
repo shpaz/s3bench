@@ -132,10 +132,10 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
 
         return diff
 
-def evaluate_latency(self, op_duration):
-    if op_duration > float(self.max_latency):
-        return 1
-    return 0
+    def evaluate_latency(self, op_duration):
+        if op_duration > float(self.max_latency):
+            return 1
+        return 0
 
     @classmethod
     def create_timestamp(cls):
