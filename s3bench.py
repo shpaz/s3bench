@@ -38,6 +38,9 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
                             required=True)
         parser.add_argument('-w', '--workload', help='workload running on s3 - read/write',
                             required=True)
+        parser.add_argument('-l', '--max-latency',
+                            help='max acceptable latency per object operation in ms',
+                            required=False)
         parser.add_argument('-c', '--cleanup',
                             help='should we cleanup all the object that were written yes/no',
                             required=False)
@@ -55,6 +58,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         self.object_name = ""
         self.num_objects = args.num_objects
         self.workload = args.workload
+self.max_latency = args.max_latency if args.max_latency else 0
         self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, #pylint: disable=invalid-name
                                aws_access_key_id=self.access_key,
@@ -127,6 +131,15 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
             diff = (end - start).total_seconds() * 1000
 
         return diff
+
+def evaluate_latency(self, op_duration):
+    if op_duration > float(self.max_latency):
+        return 1
+    return 0
+        lat_exceeded = 0
+        if op_duration > float(self.max_latency):
+            lat_exceeded = 1
+        return lat_exceeded
 
     @classmethod
     def create_timestamp(cls):
@@ -214,6 +227,9 @@ if __name__ == '__main__':
             duration = object_analyzer.time_operation('PUT', object_name=object_name_given,
                                                       bin_data=DATA)
 
+            # check if operation duration exceeded user-specified duration
+            exceeded_flag = object_analyzer.evaluate_latency(duration)
+
             # gets object size in bytes
             size_in_bytes = humanfriendly.parse_size(object_analyzer.object_size)
 
@@ -222,6 +238,7 @@ if __name__ == '__main__':
 
             # writes data to elasticsearch
             object_analyzer.write_elastic_data(latency=duration,
+                                               latency_exceeded=exceeded_flag,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
                                                size=object_analyzer.object_size,
@@ -245,6 +262,9 @@ if __name__ == '__main__':
             # gathers latency from get operation
             duration = object_analyzer.time_operation('GET', object_name_given, "")
 
+            # check if operation duration exceeded user-specified duration
+            exceeded_flag = object_analyzer.evaluate_latency(duration)
+
             # gets the object size parsed
             size = humanfriendly.format_size(object_size)
 
@@ -256,6 +276,7 @@ if __name__ == '__main__':
 
             # writes data to elasticsearch
             object_analyzer.write_elastic_data(latency=duration,
+                                               latency_exceeded=exceeded_flag,
                                                timestamp=object_analyzer.create_timestamp(),
                                                workload=object_analyzer.get_workload(),
                                                size_in_bytes=size_in_bytes,
