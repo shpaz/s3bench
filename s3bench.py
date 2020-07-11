@@ -58,7 +58,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         self.object_name = ""
         self.num_objects = args.num_objects
         self.workload = args.workload
-        self.max_latency = args.max_latency
+self.max_latency = args.max_latency if args.max_latency else 0
         self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, #pylint: disable=invalid-name
                                aws_access_key_id=self.access_key,
