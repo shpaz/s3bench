@@ -214,7 +214,11 @@ if __name__ == '__main__':
         for index in range(object_analyzer.get_objects_num()):
 
             # generates new object's name
-            object_name_given = object_analyzer.generate_object_name()
+def generate_object_name(self):
+        """This function generates randomized object name"""
+        if self.prefix != "":
+            return self.prefix + "/" + str(uuid.uuid4())
+        return str(uuid.uuid4())
 
             # add prefix to object name according its size
             object_name_with_prefix = object_analyzer.add_prefix(
