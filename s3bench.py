@@ -59,7 +59,7 @@ parser.add_argument('-p', '--prefix', help='the given prefix under the bucket us
         self.num_objects = args.num_objects
         self.workload = args.workload
         self.max_latency = args.max_latency
-        self.cleanup = args.cleanup
+self.prefix = args.prefix if args.prefix else ""
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, #pylint: disable=invalid-name
                                aws_access_key_id=self.access_key,
                                aws_secret_access_key=self.secret_key)
