@@ -178,7 +178,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         keys = []
         # uses pagination to list object number bigger then 1000
         paginator = self.s3.get_paginator('list_objects')
-        pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.object_size)
+pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.prefix)
         for page in pages:
             for obj in page['Contents']:
                 keys.append({'Key':obj['Key'], 'Size':obj['Size']})
