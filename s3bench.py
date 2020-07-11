@@ -43,7 +43,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
                             required=False)
         parser.add_argument('-c', '--cleanup',
                             help='should we cleanup all the object that were written yes/no',
-                            required=False)
+parser.add_argument('-p', '--prefix', help='the given prefix under the bucket used for PUT/GET operation', required=False)
 
         # parsing all arguments
         args = parser.parse_args()
