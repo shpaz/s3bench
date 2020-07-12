@@ -63,6 +63,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         self.workload = args.workload
         self.max_latency = args.max_latency if args.max_latency else 0
         self.prefix = args.prefix if args.prefix else ""
+        self.delimiter = "" if self.prefix else "/"
         self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, #pylint: disable=invalid-name
                                aws_access_key_id=self.access_key,
@@ -179,12 +180,14 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         In case number is bigger than 1000, use pagination, else use regular v2"""
         # in case number of objects is smaller then the page size, to save list costs
         if int(self.num_objects) <= 1000:
-            objects = self.s3.list_objects(Bucket=self.bucket_name, MaxKeys=int(self.num_objects))
+            objects = self.s3.list_objects(Bucket=self.bucket_name, MaxKeys=int(self.num_objects),
+                    Prefix=self.prefix, Delimiter=self.delimiter)
         else:
             keys = []
             # uses pagination to list object number bigger then 1000
             paginator = self.s3.get_paginator('list_objects')
-            pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.prefix)
+            pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.prefix,
+                    Delimiter=self.delimiter)
             for page in pages:
                 for obj in page['Contents']:
                     keys.append({'Key':obj['Key'], 'Size':obj['Size']})
