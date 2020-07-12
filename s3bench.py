@@ -133,6 +133,8 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         return diff
 
     def evaluate_latency(self, op_duration):
+        """This function avaluates if a given latency axceeded
+           the max-latency value provided by the customer"""
         if op_duration > float(self.max_latency):
             return 1
         return 0
