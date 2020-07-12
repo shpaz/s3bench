@@ -41,6 +41,9 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         parser.add_argument('-l', '--max-latency',
                             help='max acceptable latency per object operation in ms',
                             required=False)
+        parser.add_argument('-p', '--prefix',
+                            help='A prefix (directory) located in the bucket',
+                            required=False)
         parser.add_argument('-c', '--cleanup',
                             help='should we cleanup all the object that were written yes/no',
                             required=False)
@@ -59,6 +62,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         self.num_objects = args.num_objects
         self.workload = args.workload
         self.max_latency = args.max_latency if args.max_latency else 0
+        self.prefix = args.prefix if args.prefix else ""
         self.cleanup = args.cleanup
         self.s3 = boto3.client('s3', endpoint_url=self.endpoint_url, #pylint: disable=invalid-name
                                aws_access_key_id=self.access_key,
@@ -95,9 +99,10 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
         response = self.s3.get_object(Bucket=self.bucket_name, Key=object_name)
         response['Body'].read()
 
-    @classmethod
-    def generate_object_name(cls):
+    def generate_object_name(self):
         """This function generates randomized object name"""
+        if self.prefix != "":
+            return self.prefix + "/" + str(uuid.uuid4())
         return str(uuid.uuid4())
 
     def create_bin_data(self):
@@ -179,7 +184,7 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
             keys = []
             # uses pagination to list object number bigger then 1000
             paginator = self.s3.get_paginator('list_objects')
-            pages = paginator.paginate(Bucket=self.bucket_name)
+            pages = paginator.paginate(Bucket=self.bucket_name, Prefix=self.prefix)
             for page in pages:
                 for obj in page['Contents']:
                     keys.append({'Key':obj['Key'], 'Size':obj['Size']})

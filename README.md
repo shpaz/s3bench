@@ -36,33 +36,39 @@ To run this tool, you could run ``` docker run shonpaz123/s3bench ``` command to
 docker run shonpaz123/s3bench
 usage: s3bench.py [-h] -e ENDPOINT_URL -a ACCESS_KEY -s SECRET_KEY -b
                   BUCKET_NAME -o OBJECT_SIZE -u ELASTIC_URL -n NUM_OBJECTS -w
-                  WORKLOAD [-l MAX_LATENCY] [-c CLEANUP]
-s3bench.py: error: the following arguments are required: -e/--endpoint-url, -a/--access-key, -s/--secret-key, -b/--bucket-name, -o/--object-size, -u/--elastic-url, -n/--num-objects, -w/--workload
+                  WORKLOAD [-l MAX_LATENCY] [-p PREFIX] [-c CLEANUP]
+s3bench.py: error: the following arguments are required: -e/--endpoint-url, -a/--access-key, -s/--secret-key, -b/--bucket-name, -o/--object-size, -u/--elastic-url, -n/--num-objects, -w/--workload 
 ```
 Arguments between squrae brackets are optional, the regular ones are required. To enter the man page run the command ``` docker run shonpaz123/s3bench -h ```, for example: 
 
 ``` 
+usage: s3bench.py [-h] -e ENDPOINT_URL -a ACCESS_KEY -s SECRET_KEY -b
+                  BUCKET_NAME -o OBJECT_SIZE -u ELASTIC_URL -n NUM_OBJECTS -w
+                  WORKLOAD [-l MAX_LATENCY] [-p PREFIX] [-c CLEANUP]
+
 optional arguments:
   -h, --help            show this help message and exit
   -e ENDPOINT_URL, --endpoint-url ENDPOINT_URL
                         endpoint url for s3 object storage
-  -a ACCESS_KEY, --access-key ACCESS_KEY
+  -a ACCESS_KEY,   --access-key ACCESS_KEY
                         access key for s3 object storage
-  -s SECRET_KEY, --secret-key SECRET_KEY
+  -s SECRET_KEY,   --secret-key SECRET_KEY
                         secret key for s3 object storage
-  -b BUCKET_NAME, --bucket-name BUCKET_NAME
+  -b BUCKET_NAME,  --bucket-name BUCKET_NAME
                         s3 bucket name
-  -o OBJECT_SIZE, --object-size OBJECT_SIZE
+  -o OBJECT_SIZE,  --object-size OBJECT_SIZE
                         s3 object size
-  -u ELASTIC_URL, --elastic-url ELASTIC_URL
+  -u ELASTIC_URL,  --elastic-url ELASTIC_URL
                         elastic cluster url
-  -n NUM_OBJECTS, --num-objects NUM_OBJECTS
+  -n NUM_OBJECTS,  --num-objects NUM_OBJECTS
                         number of objects to put/get
-  -w WORKLOAD, --workload WORKLOAD
+  -w WORKLOAD,     --workload WORKLOAD
                         workload running on s3 - read/write
-  -l MAX_LATENCY, --max-latency MAX_LATENCY
+  -l MAX_LATENCY,  --max-latency MAX_LATENCY
                         max acceptable latency per object operation in ms
-  -c CLEANUP, --cleanup CLEANUP
+  -p PREFIX,       --prefix PREFIX
+                        A prefix (directory) located in the bucket
+  -c CLEANUP,      --cleanup CLEANUP
                         should we cleanup all the object that were written
                         yes/no
 ```
@@ -116,7 +122,7 @@ sudo docker run --link 7ed851e60565:elasticsearch shonpaz123/s3bench -e http://$
 Run and connect to Kibana:
 
 ```shell
-sudo docker run --link 7ed851e60565:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:7.5
+sudo docker run --link 7ed851e60565:elasticsearch -p 5601:5601 docker.elastic.co/kibana/kibana:7.5.0
 
 firefox http://127.0.0.1:5601
 ```
