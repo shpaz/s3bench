@@ -1,0 +1,15 @@
+################### RedHat Login Info ###############################
+registry_username: ""
+registry_password: ""
+consul_image: "spaz.tlv.csb/consul"
+
+################## Consul domain Config #############################
+dc_name: "dc1"
+domain_name: "domain1"
+consul_interface: "wlp0s20f3"
+
+################# RGWs to point to ##################################
+rgws: 
+  ceph-osd1.rgw0:
+    rgw_port: 8000
+    rgw_ip: 192.168.1.20

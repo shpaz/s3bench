@@ -1,0 +1,23 @@
+- name: Search for any existing elasticsearch 
+  shell: | 
+    podman ps -a  
+  register: containers_exist
+  tags:
+  - start_infra
+
+- name: Clean exsiting elasticsearch
+  shell: | 
+    podman rm -f elasticsearch
+  when: containers_exist.stdout_lines | select('search', 'elasticsearch') | list | length > 0
+  tags:
+  - start_infra
+
+- name: Start elasticsearch container using Podman
+  shell: |
+    podman run --pod s3bench --name elasticsearch \
+     -e "discovery.type=single-node" \
+     -e "xpack.security.enabled=false" \
+     -d {{ elasticsearch_image }}
+  tags:
+  - start_infra
+

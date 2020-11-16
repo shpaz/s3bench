@@ -1,0 +1,10 @@
+- name: Create dasboards with an API requests 
+  command: "curl -X POST {{ inventory_hostname }}:5601/api/saved_objects/_import -H 'kbn-xsrf: true' --form file=@../roles/s3bench/files/s3_dashboard.ndjson" 
+  register: result
+  until: result is succeeded
+  retries: 40
+  delay: 3
+  tags:
+  - create_dashboards
+
+

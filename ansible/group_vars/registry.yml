@@ -1,0 +1,24 @@
+################ General Config ################################3######
+ansible_connection: local
+registry_full_fqdn: spaz.tlv.csb
+
+################ Prepare Disconnected Artifacts #########################
+mirror_disconnected_images: "true"
+disconnected_images: 
+- "registry.redhat.io/openshift4/ose-prometheus-node-exporter:v4.1"
+- "registry.redhat.io/rhceph/rhceph-4-dashboard-rhel8:4"
+- "registry.redhat.io/openshift4/ose-prometheus:4.1" 
+- "registry.redhat.io/openshift4/ose-prometheus-alertmanager:4.1"
+- "registry.redhat.io/rhceph/rhceph-4-rhel8"
+- "docker.io/shonpaz123/s3bench"
+- "docker.elastic.co/elasticsearch/elasticsearch:7.7.1"
+- "docker.elastic.co/kibana/kibana:7.7.1"
+- "docker.io/consul"
+
+################### RedHat Login Info ###############################
+rh_username: ""
+rh_password: ""
+
+################## Saved zip container image for whitening ############################
+registry_data_action: "import" # 'export' to export a zipped file, 'import' to load the zip to an existing registry 
+tar_location: "/home/spaz"

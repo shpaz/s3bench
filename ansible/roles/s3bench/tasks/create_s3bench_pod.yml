@@ -1,0 +1,23 @@
+- name: Search for any existing s3bench pod
+  shell: | 
+    podman pod ps  
+  register: containers_exist
+  tags:
+  - start_infra
+ 
+
+- name: Clean exsiting s3bench pod
+  shell: | 
+    podman pod rm -f s3bench
+  when: containers_exist.stdout_lines | select('search', 's3bench') | list | length > 0
+  tags:
+  - start_infra
+
+- name: Start s3bench pod using Podman
+  shell: |
+    podman pod create --name s3bench \
+     -p 9200:9200 -p 9300:9300 -p 5601:5601
+  tags:
+  - start_infra
+
+

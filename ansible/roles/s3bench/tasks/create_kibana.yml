@@ -1,0 +1,22 @@
+- name: Search for any existing registry 
+  shell: | 
+    podman ps -a  
+  register: containers_exist
+  tags:
+  - start_infra
+
+- name: Clean exsiting registry 
+  shell: | 
+    podman rm -f kibana 
+  when: containers_exist.stdout_lines | select('search', 'kibana') | list | length > 0
+  tags:
+  - start_infra
+
+- name: Start registry container using Podman
+  shell: |
+    podman run --pod s3bench --name kibana \
+     -e "ELASTICSEARCH_HOSTS=http://localhost:9200" \
+     -d {{ kibana_image }}
+  tags:
+  - start_infra
+

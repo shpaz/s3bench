@@ -1,0 +1,7 @@
+---
+- hosts: s3bench
+  gather_facts: true
+  tasks:
+    - include_role:
+        name: s3bench
+      tags: ["start_s3bench", "start_infra", "create_dashboards"]

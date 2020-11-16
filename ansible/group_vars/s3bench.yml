@@ -1,0 +1,20 @@
+################ General Config ################################3######
+elasticsearch_image: spaz.tlv.csb/elasticsearch/elasticsearch:7.7.1
+kibana_image: spaz.tlv.csb/kibana/kibana:7.7.1
+
+################ S3bench Config #######################################
+s3bench_instances: 7
+s3bench_image: spaz.tlv.csb/shonpaz123/s3bench
+
+############### Workload Config #######################################
+access_key: BX8FVNZ0DDMA069PBL9I 
+secret_key: I0k4g12ixY5mtNynvVc9BJNUlQL6aAfeXHJoz6db
+endpoint_url: http://192.168.1.20:8000
+bucket_name: bucket
+object_size: 4KiB
+elastic_url: http://localhost:9200 
+num_objects: 1000 
+workload: write 
+
+
+

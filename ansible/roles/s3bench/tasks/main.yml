@@ -1,0 +1,31 @@
+---
+# tasks file for registry
+
+- name: Create an S3bench Pod 
+  include_tasks: create_s3bench_pod.yml
+  tags:
+  - start_infra
+
+- name: Create An ElasticSearch Instance 
+  include_tasks: create_es.yml
+  tags:
+  - start_infra
+
+- name: Create A Kibana Instance
+  include_tasks: create_kibana.yml
+  tags:
+  - start_infra
+
+- name: Create Kibana Dashboards 
+  include_tasks: create_dashboards.yml
+  tags:
+  - create_dashboards
+
+- name: Submit S3bench Workload
+  include_tasks: create_s3bench.yml
+  tags:
+  - start_s3bench
+
+
+
+
