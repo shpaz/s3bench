@@ -220,6 +220,9 @@ if __name__ == '__main__':
     # creates binary data
     DATA = object_analyzer.create_bin_data()
 
+    # To generate a random hostname for container runtime
+    source = socket.gethostname()+str(uuid.uuid4())
+
     # verifies that user indeed wants to write
     if object_analyzer.get_workload() == "write":
 
@@ -251,7 +254,7 @@ if __name__ == '__main__':
                                                size_in_bytes=size_in_bytes,
                                                throughput=throughput,
                                                object_name=object_name_given,
-                                               source=socket.gethostname())
+                                               source=source)
 
     # in case the user chosen read operation
     elif object_analyzer.get_workload() == "read":
@@ -289,7 +292,7 @@ if __name__ == '__main__':
                                                size=size,
                                                object_name=object_name_given,
                                                throughput=throughput,
-                                               source=socket.gethostname())
+                                               source=source)
     # in case cleanup is chosen
     if object_analyzer.get_cleanup() == "yes":
         object_analyzer.objects_cleanup()
