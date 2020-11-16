@@ -95,6 +95,41 @@ This role divides into three parts:
 * The second part, deploys the s3bench service, which is being defined by a workload located in `group_vars/s3bench.yml`. Once you edit this vars file with your configuration (such as endpoint_url, access_key, secret_key, bucket_name, etc) you could pick the hosts you want to run these on by editing the inventory file. After running ```ansible-playbook playbooks/s3bench.yml -i hosts --tags start_s3bench```, the playbook will add the needed containers to the pod and start testing your S3 service. 
 * The third part, created the dashboards, running ```ansible-playbook playbooks/s3bench.yml -i hosts --tags create_dashboards``` will send an API request to Kibana wit hthe needed ndjson file. 
 
+For example: 
+```bash
+$ ansible-playbook playbooks/s3bench.yml -i hosts --tags start_s3bench
+
+TASK [s3bench : Search for any existing s3bench pod] *****************************************************************************************************************************************
+changed: [localhost]
+
+TASK [s3bench : Create A S3bench Pod If Not Exists] ******************************************************************************************************************************************
+skipping: [localhost]
+
+TASK [s3bench : Search for any existing s3bench instance] ************************************************************************************************************************************
+changed: [localhost]
+
+TASK [s3bench : Clean exsiting s3bench] ******************************************************************************************************************************************************
+changed: [localhost] => (item=0)
+changed: [localhost] => (item=1)
+changed: [localhost] => (item=2)
+changed: [localhost] => (item=3)
+changed: [localhost] => (item=4)
+changed: [localhost] => (item=5)
+changed: [localhost] => (item=6)
+
+TASK [s3bench : Start s3bench container using Podman] ****************************************************************************************************************************************
+changed: [localhost] => (item=0)
+changed: [localhost] => (item=1)
+changed: [localhost] => (item=2)
+changed: [localhost] => (item=3)
+changed: [localhost] => (item=4)
+changed: [localhost] => (item=5)
+changed: [localhost] => (item=6)
+
+PLAY RECAP ***********************************************************************************************************************************************************************************
+localhost                  : ok=6    changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+```
+
 
 ## Results Analysis
 
