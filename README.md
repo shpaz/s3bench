@@ -85,6 +85,17 @@ Creating s3bench_s3bench_4   ... done
 Creating s3bench_s3bench_5   ... done
 ```
 
+### Ansible For Multiclient Support 
+
+The `S3bench` role will create an entire infrastructure for you to start benchmarking your S3 service in a multiclient manner. This role creates a podman pod that interacts with your S3 service, creates a workload and documents all results in an ELK stack deployed by this role as well. In addition, There is an automation for throwing in some pre-defined dashboards that will help you analyze the results you get when performing the workload. 
+
+This role divides into three parts: 
+
+* The first part, deploys the ELK stack, and can be initiated by runinng ```ansible-playbook playbooks/s3bench.yml -i hosts --tags start_infra```. This will deploy an ELK stack, that will be available by host networking and can be accessed via port 5601 (Kibana port). 
+* The second part, deploys the s3bench service, which is being defined by a workload located in `group_vars/s3bench.yml`. Once you edit this vars file with your configuration (such as endpoint_url, access_key, secret_key, bucket_name, etc) you could pick the hosts you want to run these on by editing the inventory file. After running ```ansible-playbook playbooks/s3bench.yml -i hosts --tags start_s3bench```, the playbook will add the needed containers to the pod and start testing your S3 service. 
+* The third part, created the dashboards, running ```ansible-playbook playbooks/s3bench.yml -i hosts --tags create_dashboards``` will send an API request to Kibana wit hthe needed ndjson file. 
+
+
 ## Results Analysis
 
 This repository provides the ability of importing pre-built kibana dashboard for viewing bechmark data, how-to is provided in the next section. The dashboard will appear on kibana's dashboard section in the name 'Demo'.
