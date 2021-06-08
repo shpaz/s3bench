@@ -98,7 +98,6 @@ class ObjectAnalyzer(object): #pylint: disable=too-many-instance-attributes
     def get_object(self, object_name):
         """This function gets an object from object storage"""
         response = self.s3.get_object(Bucket=self.bucket_name, Key=object_name)
-        response['Body'].read()
 
     def generate_object_name(self):
         """This function generates randomized object name"""
